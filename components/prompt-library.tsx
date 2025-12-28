@@ -18,13 +18,23 @@ interface PromptLibraryProps {
     hideFilters?: boolean
     showViewMore?: boolean
     title?: string
+    defaultFilter?: string
 }
 
-export function PromptLibrary({ limit, hideFilters = false, showViewMore = false, title = "明日から使える！魔法のプロンプト集" }: PromptLibraryProps) {
+export function PromptLibrary({
+    limit,
+    hideFilters = false,
+    showViewMore = false,
+    title = "明日から使える！魔法のプロンプト集",
+    defaultFilter = "all"
+}: PromptLibraryProps) {
     const { isLoggedIn, bookmarks, toggleBookmark, setShowRegistrationModal } = useAuth()
     const searchParams = useSearchParams()
 
+    // Check URL params for filter, otherwise use default
+    const urlFilter = searchParams.get("filter")
     const [searchTerm, setSearchTerm] = useState("")
+    const [activeTab, setActiveTab] = useState<string>(urlFilter || defaultFilter)
     const [selectedTag, setSelectedTag] = useState<string | null>(null)
     const [copiedId, setCopiedId] = useState<string | null>(null)
 

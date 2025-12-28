@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, Zap, LogOut, Bookmark } from "lucide-react"
+import { Menu, Zap, LogOut, Bookmark, Search, Copy, Check, Lock, ArrowRight, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -116,9 +116,17 @@ export function Header() {
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={handleMyBookmarks} className="cursor-pointer">
-                                        <Bookmark className="mr-2 h-4 w-4" />
-                                        <span>ブックマーク</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/mypage" className="cursor-pointer w-full flex items-center">
+                                            <User className="mr-2 h-4 w-4" />
+                                            <span>マイページ</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/mypage?tab=bookmarks" className="cursor-pointer w-full flex items-center">
+                                            <Bookmark className="mr-2 h-4 w-4" />
+                                            <span>保存したプロンプト</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">

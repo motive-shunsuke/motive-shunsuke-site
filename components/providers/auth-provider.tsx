@@ -9,6 +9,8 @@ interface User {
     lastName: string
     email: string
     company: string
+    title?: string       // Job Title
+    description?: string // Bio/Profile text
     avatarUrl: string
 }
 
@@ -17,6 +19,7 @@ interface AuthContextType {
     isLoggedIn: boolean
     login: () => Promise<void>
     logout: () => Promise<void>
+    updateProfile: (data: Partial<User>) => void
     bookmarks: string[]
     toggleBookmark: (promptId: string) => void
     showRegistrationModal: boolean
@@ -29,24 +32,34 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession()
     const [bookmarks, setBookmarks] = useState<string[]>([])
     const [showRegistrationModal, setShowRegistrationModal] = useState(false)
+    const [extendedProfile, setExtendedProfile] = useState<Partial<User>>({})
 
-    // Load bookmarks from localStorage
+    // Load bookmarks and extended profile from localStorage
     useEffect(() => {
-        const saved = localStorage.getItem("bizhack_bookmarks")
-        if (saved) {
-            setBookmarks(JSON.parse(saved))
+        const savedBookmarks = localStorage.getItem("bizhack_bookmarks")
+        if (savedBookmarks) {
+            setBookmarks(JSON.parse(savedBookmarks))
+        }
+
+        const savedProfile = localStorage.getItem("bizhack_extended_profile")
+        if (savedProfile) {
+            setExtendedProfile(JSON.parse(savedProfile))
         }
     }, [])
 
-    // Map session to User object
+    // Map session to User object, merging with extended profile
     const user: User | null = session?.user ? {
         id: session.user.email || "user",
-        // Use raw Google Profile data if available (from custom session callback), otherwise fallback to name splitting
+        // Use raw Google Profile data if available, otherwise fallback
         firstName: (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : ""),
         lastName: (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : ""),
         email: session.user.email || "",
-        company: "Member",
-        avatarUrl: session.user.image || "https://github.com/shadcn.png"
+        avatarUrl: session.user.image || "https://github.com/shadcn.png",
+
+        // Extended fields (Local Storage has priority for edits, fallback to defaults)
+        company: extendedProfile.company || "Member",
+        title: extendedProfile.title || "",
+        description: extendedProfile.description || ""
     } : null
 
     const login = async () => {
@@ -55,6 +68,14 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
 
     const logout = async () => {
         await signOut()
+    }
+
+    const updateProfile = (data: Partial<User>) => {
+        setExtendedProfile(prev => {
+            const newProfile = { ...prev, ...data }
+            localStorage.setItem("bizhack_extended_profile", JSON.stringify(newProfile))
+            return newProfile
+        })
     }
 
     const toggleBookmark = (promptId: string) => {
@@ -79,6 +100,7 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
             isLoggedIn: status === "authenticated",
             login,
             logout,
+            updateProfile,
             bookmarks,
             toggleBookmark,
             showRegistrationModal,
