@@ -11,7 +11,7 @@ export default function Home() {
       <Header />
       <Hero />
       <div id="prompts">
-        <PromptLibrary />
+        <PromptLibrary limit={6} hideFilters={true} showViewMore={true} />
       </div>
       <div id="products">
         <ProductLinks />

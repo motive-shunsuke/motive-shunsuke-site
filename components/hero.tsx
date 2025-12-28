@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -63,13 +64,15 @@ export function Hero() {
                 >
                     プロンプト集を見る
                 </Button>
-                <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-12 rounded-full border-slate-200 px-8 text-base font-semibold text-slate-700 hover:bg-white hover:text-slate-900 hover:border-slate-300 cursor-pointer"
-                >
-                    お問い合わせ
-                </Button>
+                <Link href="/contact">
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        className="h-12 rounded-full border-slate-200 px-8 text-base font-semibold text-slate-700 hover:bg-white hover:text-slate-900 hover:border-slate-300 cursor-pointer"
+                    >
+                        お問い合わせ
+                    </Button>
+                </Link>
             </motion.div>
 
             <motion.div
