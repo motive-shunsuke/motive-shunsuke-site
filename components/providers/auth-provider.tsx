@@ -41,8 +41,9 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     // Map session to User object
     const user: User | null = session?.user ? {
         id: session.user.email || "user",
-        firstName: session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : "", // Everything after first space
-        lastName: session.user.name ? session.user.name.split(" ")[0] : "", // First part or full name
+        // Use raw Google Profile data if available (from custom session callback), otherwise fallback to name splitting
+        firstName: (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : ""),
+        lastName: (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : ""),
         email: session.user.email || "",
         company: "Member",
         avatarUrl: session.user.image || "https://github.com/shadcn.png"
