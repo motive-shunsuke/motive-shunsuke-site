@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, User as UserIcon, Heart, Save } from "lucide-react"
 
-export default function MyPage() {
+function MyPageContent() {
     const { user, isLoggedIn, updateProfile } = useAuth()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -205,27 +205,11 @@ export default function MyPage() {
                                     </div>
                                     <PromptLibrary
                                         limit={100}
-                                        hideFilters={true} // In bookmarks tab, we might just want a simple list, but filters are okay too. Let's hide filters for cleaner view.
-                                        title="" // Hide default title
+                                        hideFilters={true}
+                                        title=""
                                         showViewMore={false}
+                                        defaultFilter="bookmarks"
                                     />
-                                    {/* Note: PromptLibrary handles the "My Bookmarks" filter logic internally if we select the tab? 
-                                        Actually PromptLibrary state is internal. 
-                                        We might need to FORCE the filter to 'bookmarks' via prop or verify PromptLibrary implementation.
-                                        
-                                        Wait, PromptLibrary has internal state. If I mount a fresh one here, it defaults to 'all'.
-                                        I should probably Update PromptLibrary to accept an `initialFilter` prop or `forceFilter`.
-                                        
-                                        For now, I'll assume users will click the "Bookmarks" tab inside PromptLibrary if they want to filter, 
-                                        OR I can just rely on the user navigating to filters. 
-                                        
-                                        BETTER: Let's assume this page IS the bookmarks access. 
-                                        If I pass `hideFilters={false}`, they can use "My Bookmarks" tab there.
-                                        But wait, `PromptLibrary` has a "My Bookmarks" tab.
-                                        If I use `PromptLibrary`, it shows *all* tabs.
-                                        
-                                        Let's Update `PromptLibrary` to accept `defaultFilter="bookmarks"`.
-                                    */}
                                 </Card>
                             </TabsContent>
                         </Tabs>
@@ -235,5 +219,13 @@ export default function MyPage() {
 
             <Footer />
         </main>
+    )
+}
+
+export default function MyPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>}>
+            <MyPageContent />
+        </Suspense>
     )
 }
