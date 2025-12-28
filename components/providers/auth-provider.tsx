@@ -41,10 +41,10 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     // Map session to User object
     const user: User | null = session?.user ? {
         id: session.user.email || "user",
-        firstName: session.user.name ? session.user.name.split(" ").slice(-1)[0] : "User", // Simple split
-        lastName: session.user.name ? session.user.name.split(" ")[0] : "",
+        firstName: session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : "", // Everything after first space
+        lastName: session.user.name ? session.user.name.split(" ")[0] : "", // First part or full name
         email: session.user.email || "",
-        company: "Member", // Google doesn't provide company by default
+        company: "Member",
         avatarUrl: session.user.image || "https://github.com/shadcn.png"
     } : null
 

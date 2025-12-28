@@ -2,13 +2,15 @@
 "use client"
 
 import { useState } from "react"
+import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function WebToLeadForm() {
+    const { user, isLoggedIn, login } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
-    const [isGoogleLoggedIn, setIsGoogleLoggedIn] = useState(false)
+    const [isFilled, setIsFilled] = useState(false)
 
     // Form State for controlled inputs (to allow auto-fill)
     const [formData, setFormData] = useState({
@@ -20,21 +22,25 @@ export function WebToLeadForm() {
         description: "" // Message
     })
 
-    const handleGoogleLogin = () => {
+    const handleAutoFill = async () => {
         setIsLoading(true)
-        // Simulate Google Login API call
-        setTimeout(() => {
-            setIsLoading(false)
-            setIsGoogleLoggedIn(true)
-            // Auto-fill Logic
-            setFormData(prev => ({
-                ...prev,
-                last_name: "坂井", // Example data from Google
-                first_name: "俊介",
-                email: "shunsuke@example.com",
-                company: "Insta BizHack Inc."
-            }))
-        }, 1500)
+
+        if (!isLoggedIn || !user) {
+            await login()
+            return
+        }
+
+        // Fill data from User object
+        setFormData(prev => ({
+            ...prev,
+            last_name: user.lastName,
+            first_name: user.firstName,
+            email: user.email,
+            company: user.company !== "Member" ? user.company : "", // Only use if real company name exists
+        }))
+
+        setIsFilled(true)
+        setIsLoading(false)
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -61,23 +67,23 @@ export function WebToLeadForm() {
                     </p>
                     <Button
                         variant="outline"
-                        onClick={handleGoogleLogin}
-                        disabled={isLoading || isGoogleLoggedIn}
+                        onClick={handleAutoFill}
+                        disabled={isLoading || isFilled}
                         className="bg-white hover:bg-slate-50 relative border-slate-200"
                     >
                         {isLoading ? (
                             <span className="flex items-center gap-2">
                                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
-                                取得中...
+                                処理中...
                             </span>
-                        ) : isGoogleLoggedIn ? (
+                        ) : isFilled ? (
                             <span className="flex items-center gap-2 text-green-600 font-bold">
                                 ✓ 入力完了
                             </span>
                         ) : (
                             <span className="flex items-center gap-2">
                                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
-                                Googleで自動入力
+                                {isLoggedIn ? "Google情報で自動入力" : "Googleでログインして自動入力"}
                             </span>
                         )}
                     </Button>
