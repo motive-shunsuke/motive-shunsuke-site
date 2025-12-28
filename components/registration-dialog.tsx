@@ -15,7 +15,7 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { CheckCircle, Loader2 } from "lucide-react"
 
 export function RegistrationDialog() {
-    const { user, isLoggedIn, login, showRegistrationModal, setShowRegistrationModal } = useAuth()
+    const { user, isLoggedIn, login, showRegistrationModal, setShowRegistrationModal, updateProfile } = useAuth()
     const [step, setStep] = useState<"initial" | "form" | "success">("initial")
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -55,6 +55,13 @@ export function RegistrationDialog() {
 
     const handleRegister = async () => {
         setIsLoading(true)
+
+        // Save profile updates (in case user edited name/company)
+        updateProfile({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            company: formData.company
+        })
 
         // 1. Web-to-Lead Logic
         const w2lData = new FormData()
@@ -139,11 +146,19 @@ export function RegistrationDialog() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium text-slate-500">姓</label>
-                                    <Input value={formData.lastName} readOnly className="bg-slate-50" />
+                                    <Input
+                                        value={formData.lastName}
+                                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                        className="bg-white"
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium text-slate-500">名</label>
-                                    <Input value={formData.firstName} readOnly className="bg-slate-50" />
+                                    <Input
+                                        value={formData.firstName}
+                                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                        className="bg-white"
+                                    />
                                 </div>
                             </div>
                             <div className="space-y-2">

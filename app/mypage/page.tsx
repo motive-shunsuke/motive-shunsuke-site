@@ -22,6 +22,8 @@ export default function MyPage() {
 
     const [isSaving, setIsSaving] = useState(false)
     const [profileData, setProfileData] = useState({
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
         company: user?.company || "",
         title: user?.title || "",
         description: user?.description || ""
@@ -31,6 +33,8 @@ export default function MyPage() {
     useState(() => {
         if (user) {
             setProfileData({
+                firstName: user.firstName || "",
+                lastName: user.lastName || "",
                 company: user.company || "",
                 title: user.title || "",
                 description: user.description || ""
@@ -63,6 +67,8 @@ export default function MyPage() {
         await new Promise(r => setTimeout(r, 800))
 
         updateProfile({
+            firstName: profileData.firstName,
+            lastName: profileData.lastName,
             company: profileData.company,
             title: profileData.title,
             description: profileData.description
@@ -114,18 +120,26 @@ export default function MyPage() {
                                     <CardHeader>
                                         <CardTitle>プロフィール編集</CardTitle>
                                         <CardDescription>
-                                            アカウント情報を管理できます。基本情報はGoogleアカウントと連携されています。
+                                            アカウント情報を管理できます。
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700">姓 (Google)</label>
-                                                <Input value={user?.lastName} disabled className="bg-slate-50" />
+                                                <label className="text-sm font-medium text-slate-700">姓</label>
+                                                <Input
+                                                    value={profileData.lastName}
+                                                    onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
+                                                    className="bg-white"
+                                                />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700">名 (Google)</label>
-                                                <Input value={user?.firstName} disabled className="bg-slate-50" />
+                                                <label className="text-sm font-medium text-slate-700">名</label>
+                                                <Input
+                                                    value={profileData.firstName}
+                                                    onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                                                    className="bg-white"
+                                                />
                                             </div>
                                         </div>
 

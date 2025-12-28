@@ -50,9 +50,9 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     // Map session to User object, merging with extended profile
     const user: User | null = session?.user ? {
         id: session.user.email || "user",
-        // Use raw Google Profile data if available, otherwise fallback
-        firstName: (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : ""),
-        lastName: (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : ""),
+        // Local edits (extendedProfile) take priority over Google data
+        firstName: extendedProfile.firstName || (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : ""),
+        lastName: extendedProfile.lastName || (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : ""),
         email: session.user.email || "",
         avatarUrl: session.user.image || "https://github.com/shadcn.png",
 
