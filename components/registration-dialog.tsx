@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/providers/auth-provider"
 import { CheckCircle, Loader2 } from "lucide-react"
+import ReCAPTCHA from "react-google-recaptcha"
 
 export function RegistrationDialog() {
     const { user, isLoggedIn, login, showRegistrationModal, setShowRegistrationModal, updateProfile } = useAuth()
@@ -24,6 +25,7 @@ export function RegistrationDialog() {
         email: "",
         company: ""
     })
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
     // Handle Post-Login Logic (If logged in but not registered in Salesforce)
     useEffect(() => {
@@ -72,6 +74,9 @@ export function RegistrationDialog() {
         w2lData.append("email", formData.email)
         w2lData.append("company", formData.company || "Individual") // Fallback
         w2lData.append("description", "Registered via Prompt Library (Google Auth)")
+        if (captchaToken) {
+            w2lData.append("g-recaptcha-response", captchaToken)
+        }
 
         try {
             await fetch("https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8", {
@@ -174,11 +179,19 @@ export function RegistrationDialog() {
                                 />
                             </div>
 
+                            <div className="flex justify-center my-2">
+                                <ReCAPTCHA
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""} // Ideally prevent crash if missing
+                                    onChange={(val) => setCaptchaToken(val)}
+                                    size="compact"
+                                />
+                            </div>
+
                             <Button
                                 size="lg"
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold mt-2"
                                 onClick={handleRegister}
-                                disabled={isLoading || !formData.company}
+                                disabled={isLoading || !formData.company || !captchaToken}
                             >
                                 {isLoading ? (
                                     <>

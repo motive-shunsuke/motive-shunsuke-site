@@ -6,11 +6,13 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import ReCAPTCHA from "react-google-recaptcha"
 
 export function WebToLeadForm() {
     const { user, isLoggedIn, login } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
     const [isFilled, setIsFilled] = useState(false)
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
     // Form State for controlled inputs (to allow auto-fill)
     const [formData, setFormData] = useState({
@@ -157,6 +159,8 @@ export function WebToLeadForm() {
                             />
                         </div>
 
+
+
                         <div className="space-y-2">
                             <label htmlFor="description" className={labelClass}>お問い合わせ内容</label>
                             <textarea
@@ -170,7 +174,19 @@ export function WebToLeadForm() {
                             />
                         </div>
 
-                        <Button type="submit" size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all">
+                        <div className="flex justify-center my-4">
+                            <ReCAPTCHA
+                                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""} // Ideally this prevents crash if missing, but will show error in UI
+                                onChange={(val) => setCaptchaToken(val)}
+                            />
+                        </div>
+
+                        <Button
+                            type="submit"
+                            size="lg"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
+                            disabled={!captchaToken}
+                        >
                             送信する
                         </Button>
                     </div>
