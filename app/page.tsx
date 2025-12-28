@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { PromptLibrary } from "@/components/prompt-library"
@@ -11,7 +12,9 @@ export default function Home() {
       <Header />
       <Hero />
       <div id="prompts">
-        <PromptLibrary limit={6} hideFilters={true} showViewMore={true} />
+        <Suspense fallback={<div className="container mx-auto px-4 py-20 text-center">Loading prompts...</div>}>
+          <PromptLibrary limit={6} hideFilters={true} showViewMore={true} />
+        </Suspense>
       </div>
       <div id="products">
         <ProductLinks />
