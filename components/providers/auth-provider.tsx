@@ -1,9 +1,10 @@
-
 "use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useState } from "react"
+import { SessionProvider, useSession, signIn, signOut } from "next-auth/react"
 
-interface UserProfile {
+interface User {
+    id: string
     firstName: string
     lastName: string
     email: string
@@ -12,11 +13,11 @@ interface UserProfile {
 }
 
 interface AuthContextType {
-    user: UserProfile | null
+    user: User | null
     isLoggedIn: boolean
+    login: () => Promise<void>
+    logout: () => Promise<void>
     bookmarks: string[]
-    login: (profile: UserProfile) => void
-    logout: () => void
     toggleBookmark: (promptId: string) => void
     showRegistrationModal: boolean
     setShowRegistrationModal: (show: boolean) => void
@@ -24,38 +25,39 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<UserProfile | null>(null)
+function AuthProviderContent({ children }: { children: React.ReactNode }) {
+    const { data: session, status } = useSession()
     const [bookmarks, setBookmarks] = useState<string[]>([])
     const [showRegistrationModal, setShowRegistrationModal] = useState(false)
 
-    // Load from localStorage on mount
+    // Load bookmarks from localStorage
     useEffect(() => {
-        const storedUser = localStorage.getItem('user_profile')
-        const storedBookmarks = localStorage.getItem('user_bookmarks')
-
-        if (storedUser) {
-            setUser(JSON.parse(storedUser))
-        }
-        if (storedBookmarks) {
-            setBookmarks(JSON.parse(storedBookmarks))
+        const saved = localStorage.getItem("bizhack_bookmarks")
+        if (saved) {
+            setBookmarks(JSON.parse(saved))
         }
     }, [])
 
-    const login = (profile: UserProfile) => {
-        setUser(profile)
-        localStorage.setItem('user_profile', JSON.stringify(profile))
+    // Map session to User object
+    const user: User | null = session?.user ? {
+        id: session.user.email || "user",
+        firstName: session.user.name ? session.user.name.split(" ").slice(-1)[0] : "User", // Simple split
+        lastName: session.user.name ? session.user.name.split(" ")[0] : "",
+        email: session.user.email || "",
+        company: "Member", // Google doesn't provide company by default
+        avatarUrl: session.user.image || "https://github.com/shadcn.png"
+    } : null
+
+    const login = async () => {
+        await signIn("google")
     }
 
-    const logout = () => {
-        setUser(null)
-        setBookmarks([]) // Optional: clear bookmarks on logout
-        localStorage.removeItem('user_profile')
-        localStorage.removeItem('user_bookmarks')
+    const logout = async () => {
+        await signOut()
     }
 
     const toggleBookmark = (promptId: string) => {
-        if (!user) {
+        if (status !== 'authenticated') {
             setShowRegistrationModal(true)
             return
         }
@@ -65,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 ? prev.filter(id => id !== promptId)
                 : [...prev, promptId]
 
-            localStorage.setItem('user_bookmarks', JSON.stringify(newBookmarks))
+            localStorage.setItem("bizhack_bookmarks", JSON.stringify(newBookmarks))
             return newBookmarks
         })
     }
@@ -73,10 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return (
         <AuthContext.Provider value={{
             user,
-            isLoggedIn: !!user,
-            bookmarks,
+            isLoggedIn: status === "authenticated",
             login,
             logout,
+            bookmarks,
             toggleBookmark,
             showRegistrationModal,
             setShowRegistrationModal
@@ -86,10 +88,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 }
 
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    return (
+        <SessionProvider>
+            <AuthProviderContent>{children}</AuthProviderContent>
+        </SessionProvider>
+    )
+}
+
 export function useAuth() {
     const context = useContext(AuthContext)
     if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider')
+        throw new Error("useAuth must be used within an AuthProvider")
     }
     return context
 }

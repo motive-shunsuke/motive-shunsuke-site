@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     Dialog,
     DialogContent,
@@ -15,30 +15,42 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { CheckCircle, Loader2 } from "lucide-react"
 
 export function RegistrationDialog() {
-    const { showRegistrationModal, setShowRegistrationModal, login } = useAuth()
+    const { user, isLoggedIn, login, showRegistrationModal, setShowRegistrationModal } = useAuth()
     const [step, setStep] = useState<"initial" | "form" | "success">("initial")
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
         lastName: "",
         firstName: "",
         email: "",
-        company: "Google User Company"
+        company: ""
     })
 
-    const handleGoogleConnect = () => {
+    // Handle Post-Login Logic (If logged in but not registered in Salesforce)
+    useEffect(() => {
+        if (isLoggedIn && user) {
+            const hasRegistered = localStorage.getItem("bizhack_sf_registered")
+            if (!hasRegistered) {
+                // User is logged in but hasn't completed Salesforce registration
+                setFormData({
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    email: user.email,
+                    company: user.company !== "Member" ? user.company : "" // Default to empty if generic
+                })
+                setStep("form")
+                setShowRegistrationModal(true)
+            } else {
+                // Already registered, ensure modal is closed
+                if (step === "initial") {
+                    setShowRegistrationModal(false)
+                }
+            }
+        }
+    }, [isLoggedIn, user, setShowRegistrationModal])
+
+    const handleGoogleLogin = async () => {
         setIsLoading(true)
-        // Simulate API delay
-        setTimeout(() => {
-            setIsLoading(false)
-            setStep("form")
-            // Auto-fill simulation
-            setFormData({
-                lastName: "坂井",
-                firstName: "俊介",
-                email: "shunsuke@salesforce-fan.com",
-                company: "Insta BizHack Inc."
-            })
-        }, 1200)
+        await login() // This triggers NextAuth Google Sign In (Redirects)
     }
 
     const handleRegister = async () => {
@@ -47,12 +59,12 @@ export function RegistrationDialog() {
         // 1. Web-to-Lead Logic
         const w2lData = new FormData()
         w2lData.append("oid", "00Dd500000CQqX6")
-        w2lData.append("retURL", "http://google.com")
+        w2lData.append("retURL", "http://google.com") // Dummy return URL since we use no-cors
         w2lData.append("last_name", formData.lastName)
         w2lData.append("first_name", formData.firstName)
         w2lData.append("email", formData.email)
-        w2lData.append("company", formData.company)
-        w2lData.append("description", "Registered via Prompt Library (Google Connect)")
+        w2lData.append("company", formData.company || "Individual") // Fallback
+        w2lData.append("description", "Registered via Prompt Library (Google Auth)")
 
         try {
             await fetch("https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8", {
@@ -61,24 +73,15 @@ export function RegistrationDialog() {
                 body: w2lData
             })
 
-            // Artificial delay
-            await new Promise(r => setTimeout(r, 1500))
-
-            // 2. Login Logic
-            login({
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                company: formData.company,
-                avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-            })
+            // Mark as registered
+            localStorage.setItem("bizhack_sf_registered", "true")
 
             setStep("success")
 
             // Close after showing success
             setTimeout(() => {
                 setShowRegistrationModal(false)
-                setStep("initial") // Reset for next time (though user is logged in now)
+                // Don't reset step immediately to avoid flicker, handled by useEffect
             }, 2000)
 
         } catch (error) {
@@ -102,13 +105,13 @@ export function RegistrationDialog() {
                         </div>
                     )}
                     <DialogTitle className="text-xl">
-                        {step === "initial" && "Googleアカウントで登録"}
+                        {step === "initial" && "Googleアカウントで登録/ログイン"}
                         {step === "form" && "アカウント情報の確認"}
                         {step === "success" && "登録が完了しました！"}
                     </DialogTitle>
                     <DialogDescription>
                         {step === "initial" && "わずか10秒で、全ての限定プロンプトをブックマーク・保存できるようになります。"}
-                        {step === "form" && "Googleから取得した情報で会員登録を行います。"}
+                        {step === "form" && "Googleから取得した情報で会員登録を完了します。会社名を入力してください。"}
                         {step === "success" && "お気に入りのプロンプトが見つかりますように。"}
                     </DialogDescription>
                 </DialogHeader>
@@ -119,7 +122,7 @@ export function RegistrationDialog() {
                             size="lg"
                             variant="outline"
                             className="w-full gap-3 border-slate-200 py-6 text-base font-medium shadow-sm hover:bg-slate-50"
-                            onClick={handleGoogleConnect}
+                            onClick={handleGoogleLogin}
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -148,15 +151,19 @@ export function RegistrationDialog() {
                                 <Input value={formData.email} readOnly className="bg-slate-50" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-medium text-slate-500">会社名</label>
-                                <Input value={formData.company} readOnly className="bg-slate-50" />
+                                <label className="text-xs font-medium text-slate-500">会社名 <span className="text-red-500">*</span></label>
+                                <Input
+                                    value={formData.company}
+                                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                                    placeholder="会社名を入力"
+                                />
                             </div>
 
                             <Button
                                 size="lg"
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold mt-2"
                                 onClick={handleRegister}
-                                disabled={isLoading}
+                                disabled={isLoading || !formData.company}
                             >
                                 {isLoading ? (
                                     <>
