@@ -6,7 +6,7 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import ReCAPTCHA from "react-google-recaptcha"
+import { ReCaptchaEnterprise } from "@/components/recaptcha-enterprise"
 
 export function WebToLeadForm() {
     const { user, isLoggedIn, login } = useAuth()

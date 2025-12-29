@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/providers/auth-provider"
 import { CheckCircle, Loader2 } from "lucide-react"
-import ReCAPTCHA from "react-google-recaptcha"
+import { ReCaptchaEnterprise } from "@/components/recaptcha-enterprise"
 
 export function RegistrationDialog() {
     const { user, isLoggedIn, login, showRegistrationModal, setShowRegistrationModal, updateProfile } = useAuth()
@@ -180,17 +180,11 @@ export function RegistrationDialog() {
                             </div>
 
                             <div className="flex justify-center my-2">
-                                {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_site_key_here" ? (
-                                    <ReCAPTCHA
-                                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                                        onChange={(val) => setCaptchaToken(val)}
-                                        size="compact"
-                                    />
-                                ) : (
-                                    <div className="text-xs text-yellow-600 bg-yellow-50 p-2 rounded">
-                                        ReCAPTCHA not configured (Dev Mode)
-                                    </div>
-                                )}
+                                <ReCaptchaEnterprise
+                                    siteKey={"6LfFuzksAAAAAD6yz93eO1s3G-3Qz2q9hblhYJf9"}
+                                    action="registration"
+                                    onVerify={(token) => setCaptchaToken(token)}
+                                />
                             </div>
 
                             <Button
