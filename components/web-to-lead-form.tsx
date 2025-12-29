@@ -185,7 +185,7 @@ export function WebToLeadForm() {
                             type="submit"
                             size="lg"
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
-                            disabled={!captchaToken}
+                            disabled={!captchaToken && !!(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_site_key_here")}
                         >
                             送信する
                         </Button>
