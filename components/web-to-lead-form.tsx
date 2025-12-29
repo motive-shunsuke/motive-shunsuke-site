@@ -175,10 +175,13 @@ export function WebToLeadForm() {
                         </div>
 
                         <div className="flex justify-center my-4">
-                            <ReCAPTCHA
-                                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""} // Ideally this prevents crash if missing, but will show error in UI
-                                onChange={(val) => setCaptchaToken(val)}
-                            />
+                            <div className="flex justify-center my-4">
+                                <ReCaptchaEnterprise
+                                    siteKey={"6LfFuzksAAAAAD6yz93eO1s3G-3Qz2q9hblhYJf9"}
+                                    action="contact_form"
+                                    onVerify={(token) => setCaptchaToken(token)}
+                                />
+                            </div>
                         </div>
 
                         <Button
