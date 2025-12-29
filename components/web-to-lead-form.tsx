@@ -180,6 +180,7 @@ export function WebToLeadForm() {
                                 action="contact_form"
                                 onVerify={(token) => setCaptchaToken(token)}
                             />
+                            {/* ReCAPTCHA V3 Enterprise Implementation confirmed */}
                         </div>
 
                         <Button
