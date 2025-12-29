@@ -180,18 +180,24 @@ export function RegistrationDialog() {
                             </div>
 
                             <div className="flex justify-center my-2">
-                                <ReCAPTCHA
-                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""} // Ideally prevent crash if missing
-                                    onChange={(val) => setCaptchaToken(val)}
-                                    size="compact"
-                                />
+                                {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_site_key_here" ? (
+                                    <ReCAPTCHA
+                                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                                        onChange={(val) => setCaptchaToken(val)}
+                                        size="compact"
+                                    />
+                                ) : (
+                                    <div className="text-xs text-yellow-600 bg-yellow-50 p-2 rounded">
+                                        ReCAPTCHA not configured (Dev Mode)
+                                    </div>
+                                )}
                             </div>
 
                             <Button
                                 size="lg"
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold mt-2"
                                 onClick={handleRegister}
-                                disabled={isLoading || !formData.company || !captchaToken}
+                                disabled={isLoading || !formData.company || (!captchaToken && !!(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_site_key_here"))}
                             >
                                 {isLoading ? (
                                     <>

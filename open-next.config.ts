@@ -1,6 +1,23 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare/config";
-import staticAssetsIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/static-assets-incremental-cache";
+
+// Custom dummy cache to prevent "Failed to set to read-only cache" errors
+// appearing in the logs when using Cloudflare Pages without R2/Worker KV
+class DummyIncrementalCache {
+	name = "dummy";
+
+	async get(key: string) {
+		return null;
+	}
+
+	async set(key: string, data: any, ctx: any) {
+		return;
+	}
+
+	async delete(key: string) {
+		return;
+	}
+}
 
 export default defineCloudflareConfig({
-	incrementalCache: staticAssetsIncrementalCache,
+	incrementalCache: () => new DummyIncrementalCache(),
 });
