@@ -21,3 +21,4 @@ class DummyIncrementalCache {
 export default defineCloudflareConfig({
 	incrementalCache: () => new DummyIncrementalCache(),
 });
+// Trigger deployment for environment variables
