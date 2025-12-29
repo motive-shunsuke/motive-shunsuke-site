@@ -25,7 +25,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     formData.append("first_name", profile?.given_name || user.name?.split(" ")[0] || "User")
                     formData.append("email", user.email || "")
                     formData.append("company", "Google Login User")  // Default company
-                    formData.append("lead_source", "Google Login")
 
                     // Fire and forget is NOT safe in Cloudflare Workers/Serverless, must await!
                     await fetch("https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8", {
