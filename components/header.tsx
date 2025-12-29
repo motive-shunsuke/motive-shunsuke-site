@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, Zap, LogOut, Bookmark, Search, Copy, Check, Lock, ArrowRight, User } from "lucide-react"
+import { Menu, Zap, LogOut, Bookmark, Search, Copy, Check, Lock, ArrowRight, User, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -59,6 +59,13 @@ export function Header() {
 
     const handleMyBookmarks = () => {
         router.push("/prompts?filter=bookmarks")
+    }
+
+    const handleDeleteAccount = () => {
+        if (confirm("本当にアカウントを削除しますか？\n（この端末からログイン情報が削除されます）")) {
+            logout()
+            alert("アカウント情報を削除しました。")
+        }
     }
 
     return (
@@ -132,6 +139,11 @@ export function Header() {
                                     <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>ログアウト</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={handleDeleteAccount} className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        <span>アカウント削除</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
