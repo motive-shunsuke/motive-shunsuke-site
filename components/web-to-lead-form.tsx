@@ -6,7 +6,7 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ReCaptchaEnterprise } from "@/components/recaptcha-enterprise"
+
 
 export function WebToLeadForm() {
     const { user, isLoggedIn, login } = useAuth()
@@ -92,11 +92,11 @@ export function WebToLeadForm() {
                 </div>
 
                 {/* Salesforce Web-to-Lead Form */}
-                <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
+                <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dd500000CQqX6" method="POST">
 
                     {/* Hidden Fields */}
-                    <input type="hidden" name="oid" value={process.env.NEXT_PUBLIC_SALESFORCE_OID || "00Dxxxxxxxxxxxx"} />
-                    <input type="hidden" name="retURL" value={`${typeof window !== 'undefined' ? window.location.origin : ''}/thanks`} />
+                    <input type="hidden" name="oid" value="00Dd500000CQqX6" />
+                    <input type="hidden" name="retURL" value="https://motive-shunsuke.com/thanks" />
 
                     {/* Visible Fields */}
                     <div className="grid gap-6">
@@ -159,8 +159,6 @@ export function WebToLeadForm() {
                             />
                         </div>
 
-
-
                         <div className="space-y-2">
                             <label htmlFor="description" className={labelClass}>お問い合わせ内容</label>
                             <textarea
@@ -174,20 +172,11 @@ export function WebToLeadForm() {
                             />
                         </div>
 
-                        <div className="flex justify-center my-4">
-                            <ReCaptchaEnterprise
-                                siteKey={"6LfFuzksAAAAAD6yz93eO1s3G-3Qz2q9hblhYJf9"}
-                                action="contact_form"
-                                onVerify={(token) => setCaptchaToken(token)}
-                            />
-                            {/* ReCAPTCHA V3 Enterprise Implementation confirmed */}
-                        </div>
-
                         <Button
                             type="submit"
                             size="lg"
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
-                            disabled={!captchaToken && !!(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_site_key_here")}
+                            disabled={isLoading}
                         >
                             送信する
                         </Button>
