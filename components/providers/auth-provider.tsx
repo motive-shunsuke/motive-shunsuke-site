@@ -75,7 +75,13 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     }
 
     const logout = async () => {
-        await signOut()
+        try {
+            await signOut({ redirect: false })
+        } catch (e) {
+            console.error("Logout error", e)
+        } finally {
+            window.location.href = "/"
+        }
     }
 
     const updateProfile = (data: Partial<User>) => {
