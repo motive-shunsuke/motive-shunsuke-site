@@ -27,8 +27,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     formData.append("company", "Google Login User")  // Default company
                     formData.append("lead_source", "Google Login")
 
-                    // Fire and forget (don't await response to allow login even if SF fails)
-                    fetch("https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8", {
+                    // Fire and forget is NOT safe in Cloudflare Workers/Serverless, must await!
+                    await fetch("https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
