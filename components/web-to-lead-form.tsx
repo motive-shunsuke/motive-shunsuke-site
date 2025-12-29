@@ -175,13 +175,11 @@ export function WebToLeadForm() {
                         </div>
 
                         <div className="flex justify-center my-4">
-                            <div className="flex justify-center my-4">
-                                <ReCaptchaEnterprise
-                                    siteKey={"6LfFuzksAAAAAD6yz93eO1s3G-3Qz2q9hblhYJf9"}
-                                    action="contact_form"
-                                    onVerify={(token) => setCaptchaToken(token)}
-                                />
-                            </div>
+                            <ReCaptchaEnterprise
+                                siteKey={"6LfFuzksAAAAAD6yz93eO1s3G-3Qz2q9hblhYJf9"}
+                                action="contact_form"
+                                onVerify={(token) => setCaptchaToken(token)}
+                            />
                         </div>
 
                         <Button
