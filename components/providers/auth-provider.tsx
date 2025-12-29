@@ -36,14 +36,22 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
 
     // Load bookmarks and extended profile from localStorage
     useEffect(() => {
-        const savedBookmarks = localStorage.getItem("bizhack_bookmarks")
-        if (savedBookmarks) {
-            setBookmarks(JSON.parse(savedBookmarks))
+        try {
+            const savedBookmarks = localStorage.getItem("bizhack_bookmarks")
+            if (savedBookmarks) {
+                setBookmarks(JSON.parse(savedBookmarks))
+            }
+        } catch (e) {
+            console.error("Failed to parse bookmarks", e)
         }
 
-        const savedProfile = localStorage.getItem("bizhack_extended_profile")
-        if (savedProfile) {
-            setExtendedProfile(JSON.parse(savedProfile))
+        try {
+            const savedProfile = localStorage.getItem("bizhack_extended_profile")
+            if (savedProfile) {
+                setExtendedProfile(JSON.parse(savedProfile))
+            }
+        } catch (e) {
+            console.error("Failed to parse profile", e)
         }
     }, [])
 
@@ -51,8 +59,8 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     const user: User | null = session?.user ? {
         id: session.user.email || "user",
         // Local edits (extendedProfile) take priority over Google data
-        firstName: extendedProfile.firstName || (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : ""),
-        lastName: extendedProfile.lastName || (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : ""),
+        firstName: extendedProfile.firstName || (session.user as any).firstName || (session.user.name && session.user.name.includes(" ") ? session.user.name.split(" ").slice(1).join(" ") : "User"),
+        lastName: extendedProfile.lastName || (session.user as any).lastName || (session.user.name ? session.user.name.split(" ")[0] : "Guest"),
         email: session.user.email || "",
         avatarUrl: session.user.image || "https://github.com/shadcn.png",
 

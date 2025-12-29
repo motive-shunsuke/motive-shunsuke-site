@@ -102,7 +102,7 @@ export function Header() {
                                     <Button variant="ghost" className="relative h-10 w-10 rounded-full cursor-pointer p-0">
                                         <Avatar className="h-10 w-10 border border-slate-200">
                                             <AvatarImage src={user.avatarUrl} alt={user.firstName} />
-                                            <AvatarFallback>{user.lastName[0]}</AvatarFallback>
+                                            <AvatarFallback>{user.lastName?.[0] || "U"}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -178,7 +178,7 @@ export function Header() {
                                     <div className="flex items-center gap-3 mb-4 p-4 bg-slate-50 rounded-lg">
                                         <Avatar className="h-10 w-10 border border-slate-200">
                                             <AvatarImage src={user.avatarUrl} alt={user.firstName} />
-                                            <AvatarFallback>{user.lastName[0]}</AvatarFallback>
+                                            <AvatarFallback>{user.lastName?.[0] || "U"}</AvatarFallback>
                                         </Avatar>
                                         <div>
                                             <p className="text-sm font-medium">{user.lastName} {user.firstName}</p>
