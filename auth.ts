@@ -4,7 +4,7 @@ import Google from "next-auth/providers/google"
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Google({
-            clientId: "720456339998-eu3lhg54oes85pcj81cbjivrq30n4ssk.apps.googleusercontent.com",
+            clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
     ],
