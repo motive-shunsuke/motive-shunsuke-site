@@ -16,13 +16,13 @@
 			// Self-reference service binding, the service name must match the worker name
 			// see https://opennext.js.org/cloudflare/caching
 			"binding": "WORKER_SELF_REFERENCE",
-			"service": "portfolio"
+			"service": "motive-shunsuke-site"
 		}
-	],
-	/* R2 removed to avoid account requirement */
+	]
+	/* Images removed to avoid extra service requirements */
+	/*
 	"images": {
-		// Enable image optimization
-		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
 	}
+	*/
 }
